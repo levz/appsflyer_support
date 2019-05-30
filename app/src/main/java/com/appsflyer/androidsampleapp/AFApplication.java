@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class AFApplication extends Application {
 
+    public static final String LOG_TAG = "AppsFlyerLog";
 
     private static final String AF_DEV_KEY = "AF_DEV_KEY";
 
@@ -30,28 +31,30 @@ public class AFApplication extends Application {
             /* Returns the attribution data. Note - the same conversion data is returned every time per install */
             @Override
             public void onInstallConversionDataLoaded(Map<String, String> conversionData) {
+                Log.d(AFApplication.LOG_TAG, "AFApplication onInstallConversionDataLoaded()  conversionData=" + conversionData);
                 for (String attrName : conversionData.keySet()) {
-                    Log.d(AppsFlyerLib.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
+                    Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
                 }
                 setInstallData(conversionData);
             }
 
             @Override
             public void onInstallConversionFailure(String errorMessage) {
-                Log.d(AppsFlyerLib.LOG_TAG, "error getting conversion data: " + errorMessage);
+                Log.d(AFApplication.LOG_TAG, "error getting conversion data: " + errorMessage);
             }
 
             /* Called only when a Deep Link is opened */
             @Override
             public void onAppOpenAttribution(Map<String, String> conversionData) {
+                Log.d(AFApplication.LOG_TAG, "AFApplication onAppOpenAttribution()  conversionData=" + conversionData);
                 for (String attrName : conversionData.keySet()) {
-                    Log.d(AppsFlyerLib.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
+                    Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
                 }
             }
 
             @Override
             public void onAttributionFailure(String errorMessage) {
-                Log.d(AppsFlyerLib.LOG_TAG, "error onAttributionFailure : " + errorMessage);
+                Log.d(AFApplication.LOG_TAG, "error onAttributionFailure : " + errorMessage);
             }
         };
 

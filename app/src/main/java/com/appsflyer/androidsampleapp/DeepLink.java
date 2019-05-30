@@ -36,24 +36,26 @@ public class DeepLink extends AppCompatActivity {
             /* Returns the attribution data. Note - the same conversion data is returned every time per install */
             @Override
             public void onInstallConversionDataLoaded(Map<String, String> conversionData) {
+                Log.d(AFApplication.LOG_TAG, "DeepLink onInstallConversionDataLoaded()  conversionData=" + conversionData);
                 for (String attrName : conversionData.keySet()) {
-                    Log.d(AppsFlyerLib.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
+                    Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
                 }
             }
 
             @Override
             public void onInstallConversionFailure(String errorMessage) {
-                Log.d(AppsFlyerLib.LOG_TAG, "error onInstallConversionFailure : " + errorMessage);
+                Log.d(AFApplication.LOG_TAG, "error onInstallConversionFailure : " + errorMessage);
             }
 
 
             /* Called only when a Deep Link is opened */
             @Override
             public void onAppOpenAttribution(Map<String, String> conversionData) {
+                Log.d(AFApplication.LOG_TAG, "DeepLink onAppOpenAttribution()  conversionData=" + conversionData);
                 String attributionDataText = "Attribution Data: \n";
                 for (String attrName : conversionData.keySet()) {
-                    Log.d(AppsFlyerLib.LOG_TAG, "attribute: " + attrName + " = " +
-                            conversionData.get(attrName));
+                    /*Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " +
+                            conversionData.get(attrName));//*/
                     attributionDataText += conversionData.get(attrName) + "\n";
 
                 }
@@ -62,7 +64,7 @@ public class DeepLink extends AppCompatActivity {
 
             @Override
             public void onAttributionFailure(String errorMessage) {
-                Log.d(AppsFlyerLib.LOG_TAG, "error onAttributionFailure : " + errorMessage);
+                Log.d(AFApplication.LOG_TAG, "error onAttributionFailure : " + errorMessage);
             }
         });
 
