@@ -24,51 +24,14 @@ public class AFApplication extends Application {
     public void onCreate(){
         super.onCreate();
 
-        /**  Set Up Conversion Listener to get attribution data **/
-
-        AppsFlyerConversionListener conversionListener = new AppsFlyerConversionListener() {
-
-            /* Returns the attribution data. Note - the same conversion data is returned every time per install */
-            @Override
-            public void onInstallConversionDataLoaded(Map<String, String> conversionData) {
-                Log.d(AFApplication.LOG_TAG, "AFApplication onInstallConversionDataLoaded()  conversionData=" + conversionData);
-                for (String attrName : conversionData.keySet()) {
-                    Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
-                }
-                setInstallData(conversionData);
-            }
-
-            @Override
-            public void onInstallConversionFailure(String errorMessage) {
-                Log.d(AFApplication.LOG_TAG, "error getting conversion data: " + errorMessage);
-            }
-
-            /* Called only when a Deep Link is opened */
-            @Override
-            public void onAppOpenAttribution(Map<String, String> conversionData) {
-                Log.d(AFApplication.LOG_TAG, "AFApplication onAppOpenAttribution()  conversionData=" + conversionData);
-                for (String attrName : conversionData.keySet()) {
-                    Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
-                }
-            }
-
-            @Override
-            public void onAttributionFailure(String errorMessage) {
-                Log.d(AFApplication.LOG_TAG, "error onAttributionFailure : " + errorMessage);
-            }
-        };
-
-
         /* This API enables AppsFlyer to detect installations, sessions, and updates. */
 
-        AppsFlyerLib.getInstance().init(AF_DEV_KEY , conversionListener , getApplicationContext());
+        AppsFlyerLib.getInstance().init(AF_DEV_KEY , new DeepLink.AppsFlyerListener(this), getApplicationContext());
         AppsFlyerLib.getInstance().startTracking(this, AF_DEV_KEY);
-
 
         /* Set to true to see the debug logs. Comment out or set to false to stop the function */
 
         AppsFlyerLib.getInstance().setDebugLog(true);
-
     }
 
 

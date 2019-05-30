@@ -37,6 +37,8 @@
 
         <activity
             android:name=".DeepLink"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="orientation|screenSize|locale|keyboard|keyboardHidden|navigation"
             android:launchMode="singleInstance"
             android:noHistory="true"
             android:excludeFromRecents="true">

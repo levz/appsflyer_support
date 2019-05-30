@@ -1,12 +1,15 @@
 package com.appsflyer.androidsampleapp;
 
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
 
-import com.appsflyer.*;
+import com.appsflyer.AppsFlyerConversionListener;
+import com.appsflyer.AppsFlyerLib;
 
 import java.util.Map;
 
@@ -15,73 +18,83 @@ import java.util.Map;
 
 
 
-public class DeepLink extends AppCompatActivity {
-
-
-    final Handler handler = new Handler();
+public class DeepLink extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deep_link);
 
-
         /* Add this call to the tracker on each deep linked activity */
-
         AppsFlyerLib.getInstance().sendDeepLinkData(this);
 
 
-        AppsFlyerLib.getInstance().registerConversionListener(this, new AppsFlyerConversionListener() {
-
-            /* Returns the attribution data. Note - the same conversion data is returned every time per install */
-            @Override
-            public void onInstallConversionDataLoaded(Map<String, String> conversionData) {
-                Log.d(AFApplication.LOG_TAG, "DeepLink onInstallConversionDataLoaded()  conversionData=" + conversionData);
-                for (String attrName : conversionData.keySet()) {
-                    Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
-                }
-            }
-
-            @Override
-            public void onInstallConversionFailure(String errorMessage) {
-                Log.d(AFApplication.LOG_TAG, "error onInstallConversionFailure : " + errorMessage);
-            }
-
-
-            /* Called only when a Deep Link is opened */
-            @Override
-            public void onAppOpenAttribution(Map<String, String> conversionData) {
-                Log.d(AFApplication.LOG_TAG, "DeepLink onAppOpenAttribution()  conversionData=" + conversionData);
-                String attributionDataText = "Attribution Data: \n";
-                for (String attrName : conversionData.keySet()) {
-                    /*Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " +
-                            conversionData.get(attrName));//*/
-                    attributionDataText += conversionData.get(attrName) + "\n";
-
-                }
-                setAttributionText(attributionDataText);
-            }
-
-            @Override
-            public void onAttributionFailure(String errorMessage) {
-                Log.d(AFApplication.LOG_TAG, "error onAttributionFailure : " + errorMessage);
-            }
-        });
-
+        // open MainActivity in case onAppAttribution is not called
+        Intent intent = getIntent();
+        if (intent != null) {
+            Intent newIntent = new Intent(
+                    intent.getAction(),
+                    intent.getData(),
+                    this,
+                    MainActivity.class);
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(newIntent);
+        }
+        finish();
     }
 
 
-    /* Used to display the deep link data returned from onAppOpenAttribution */
+    public static class AppsFlyerListener implements AppsFlyerConversionListener{
 
-    public void setAttributionText(final String data){
+        private Context mApplicationContext;
+        private Handler mHandler;
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                TextView attributionTextView = findViewById(R.id.attributionText);
-                attributionTextView.setText(data);
+        public AppsFlyerListener(Context context){
+            this.mApplicationContext = context;
+            mHandler = new Handler();
+        }
+
+        /* Returns the attribution data. Note - the same conversion data is returned every time per install */
+        @Override
+        public void onInstallConversionDataLoaded(Map<String, String> conversionData) {
+            Log.d(AFApplication.LOG_TAG, "DeepLink onInstallConversionDataLoaded()  conversionData=" + conversionData);
+            for (String attrName : conversionData.keySet()) {
+                Log.d(AFApplication.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
             }
-        } , 2500);
+        }
+
+        @Override
+        public void onInstallConversionFailure(String errorMessage) {
+            Log.d(AFApplication.LOG_TAG, "error onInstallConversionFailure : " + errorMessage);
+        }
+
+
+        /* Called only when a Deep Link is opened */
+        @Override
+        public void onAppOpenAttribution(final Map<String, String> conversionData) {
+            Log.d(AFApplication.LOG_TAG, "DeepLink onAppOpenAttribution()  conversionData=" + conversionData);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    startMainActivity(conversionData.get("af_dp"));
+                }
+            });
+        }
+
+        @Override
+        public void onAttributionFailure(String errorMessage) {
+            Log.d(AFApplication.LOG_TAG, "error onAttributionFailure : " + errorMessage);
+        }
+
+        private void startMainActivity(String af_dp){
+            Intent intent = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(af_dp != null ? af_dp : "tvzavr://test/deeplink"),
+                    mApplicationContext,
+                    MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mApplicationContext.startActivity(intent);
+        }
     }
 
 }
