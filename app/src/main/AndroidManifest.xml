@@ -35,7 +35,11 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".DeepLink">
+        <activity
+            android:name=".DeepLink"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:excludeFromRecents="true">
             <intent-filter  android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
